@@ -1,0 +1,5 @@
+ambient:
+  dnsCapture: true
+hub: ${ISTIO_REPO}
+tag: ${ISTIO_TAG}
+profile: ambient
