@@ -1,0 +1,79 @@
+common:
+  cluster: cluster1 #This is a template you will need to only override the cluster name of the cluster that will be onboarded
+glooAgent:
+  enabled: true
+  # Same token that we use in the mgmt plane to authenticate the agent.
+  extraEnvs:
+    RELAY_DISABLE_SERVER_CERTIFICATE_VALIDATION:
+      value: "true"
+    RELAY_TOKEN:
+      value: "My token"
+  # Change the serverAddress to the address of the LoadBalancer
+  relay:
+    serverAddress: 172.18.0.201:9900
+    authority: gloo-mesh-mgmt-server.gloo-mesh
+telemetryCollector:
+  enabled: true
+  config:
+    exporters:
+      otlp:
+        endpoint: gloo-telemetry-gateway.gloo-mesh.mesh.internal:4317
+telemetryCollectorCustomization:
+  skipVerify: true
+  extraExporters: # add new exporter to send to the Otel GW on port 4319
+    otlp/ambient:
+      endpoint: gloo-telemetry-gateway.gloo-mesh.mesh.internal:4319
+      tls:
+        insecure: true
+  pipelines:
+    # update pipelines to send using the new Ambient exporter
+    logs/analyzer:
+      enabled: true
+      pipeline:
+        receivers:
+          - otlp
+        processors:
+          - resource/cluster_context
+          - batch/logs
+        exporters:
+          - otlp/ambient
+    logs/ui:
+      enabled: true
+      pipeline:
+        receivers:
+          - filelog/gloo_components
+          - filelog/istiod
+        processors:
+          - resource/cluster_context
+          - resource/ui_source_context
+          - batch/logs
+        exporters:
+          - otlp/ambient
+    metrics/ui:
+      enabled: true
+      pipeline:
+        receivers:
+          - prometheus
+        processors:
+          - memory_limiter
+          - filter/min
+          - transform/keep_istio_labels
+          - transform/keep_otelcol_labels
+          - gloo_metrics_processor
+          - batch
+        exporters:
+          - otlp/ambient
+    traces/istio:
+      enabled: true
+      pipeline:
+        processors:
+          - batch
+        receivers:
+          - jaeger
+          - opencensus
+          - otlp
+          - zipkin
+        exporters:
+          - otlp/ambient
+glooAnalyzer:
+  enabled: true
