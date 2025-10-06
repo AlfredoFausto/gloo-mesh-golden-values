@@ -1,0 +1,9 @@
+profile: ambient
+hub: ${ISTIO_REPO}
+tag: ${ISTIO_TAG}
+env:
+  SKIP_VALIDATE_TRUST_DOMAIN: "true"
+multiCluster:
+  clusterName: ${cluster}
+network: ${cluster}
+terminationGracePeriodSeconds: 29
