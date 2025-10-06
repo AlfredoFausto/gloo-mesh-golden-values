@@ -1,0 +1,92 @@
+common:
+  cluster: mgmt
+glooAnalyzer:
+  enabled: true
+glooMgmtServer:
+  enabled: true
+  # The extra vars are for authenticating the agent with the mgmt server. This will be a TLS connection instead of mTLS.
+  extraEnvs:
+    RELAY_DISABLE_CLIENT_CERTIFICATE_AUTHENTICATION:
+      value: "true"
+    RELAY_TOKEN:
+      value: "My token"
+  # We need an extra LoadBalancer due to incompatibility with the new v3 Ambient mode.
+  serviceType: LoadBalancer
+  policyApis:
+    enabled: true
+experimental:
+  ambientEnabled: true
+glooInsightsEngine:
+  enabled: true
+prometheus:
+  enabled: true
+glooUi:
+  enabled: true
+  serviceType: ClusterIP
+jaeger:
+  enabled: true
+telemetryCollector:
+  enabled: true
+telemetryGateway:
+  enabled: true
+  service:
+    type: ClusterIP # LoadBalancer is no longer required. We'll take advantage of Ambient's global services.
+  ports:
+    # the following otlp settings override the Otel GW's service port from 4317 to 4319
+    otlp:
+      containerPort: 4319
+      enabled: true
+      protocol: TCP
+      servicePort: 4319
+telemetryGatewayCustomization:
+  extraReceivers:
+    # create non TLS listener on 4319, the otlp/ambient port
+    otlp/ambient:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4319
+          max_recv_msg_size_mib: 12
+  pipelines:
+    # update the pipelines to use the new receiver
+    logs/redis_stream_basic:
+      enabled: true
+      pipeline:
+        receivers:
+          - otlp/ambient
+        processors:
+          - filter/include_basic_source
+          - batch/logs
+        exporters:
+          - redisstream/basic
+    logs/redis_stream_ui:
+      enabled: true
+      pipeline:
+        receivers:
+          - otlp/ambient
+        processors:
+          - filter/include_ui_source
+          - batch/logs
+        exporters:
+          - redisstream/ui
+    metrics/prometheus:
+      enabled: true
+      pipeline:
+        receivers:
+          - otlp/ambient
+        processors:
+          - memory_limiter
+          - batch
+        exporters:
+          - prometheus
+    traces/jaeger:
+      enabled: true
+      pipeline:
+        receivers:
+          - otlp/ambient
+        processors:
+          - batch
+        exporters:
+          - otlp/jaeger
+installEnterpriseCrds: true
+featureGates:
+  ConfigDistribution: true
