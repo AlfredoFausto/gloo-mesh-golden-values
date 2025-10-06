@@ -1,4 +1,4 @@
-# gloo-mesh-golden-values
+# Gloo Mesh Golden Values
 
 ## How to install
 
