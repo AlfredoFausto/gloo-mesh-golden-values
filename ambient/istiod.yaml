@@ -4,9 +4,7 @@ tag: ${ISTIO_TAG}
 env:
 # This one is needed for auto peering
   PEERING_AUTOMATIC_LOCAL_GATEWAY: "true"
-  PILOT_ENABLE_K8S_SELECT_WORKLOAD_ENTRIES: "false"
   PILOT_SKIP_VALIDATE_TRUST_DOMAIN: "true"
-  PILOT_ENABLE_ALPHA_GATEWAY_API : "true"
 global:
   multiCluster:
     clusterName: ${cluster}
