@@ -6,14 +6,17 @@ env:
   PEERING_AUTOMATIC_LOCAL_GATEWAY: "true"
   PILOT_SKIP_VALIDATE_TRUST_DOMAIN: "true"
 global:
+  hub: ${ISTIO_REPO}
+  tag: ${ISTIO_TAG}
+  meshID: mesh1
   multiCluster:
     clusterName: ${cluster}
-  network: ${cluster}
+    enabled: true
+  network: ${NETWORK}
 meshConfig:
   defaultConfig:
     proxyMetadata:
       ISTIO_META_DNS_CAPTURE: "true"
-  trustDomain: "${cluster}"
 platforms:
   peering:
     enabled: true
