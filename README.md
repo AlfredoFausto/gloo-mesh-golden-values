@@ -130,8 +130,8 @@ kind: Gateway
 metadata:
   labels:
     istio.io/expose-istiod: "15012"
-    topology.istio.io/cluster: mgmt
-    topology.istio.io/network: mgmt
+    topology.istio.io/cluster: ${network}
+    topology.istio.io/network: ${network}
   name: istio-eastwest
   namespace: istio-eastwest
 spec:
@@ -162,8 +162,8 @@ kind: Gateway
 metadata:
   labels:
     istio.io/expose-istiod: "15012"
-    topology.istio.io/cluster: cluster1
-    topology.istio.io/network: cluster1
+    topology.istio.io/cluster: ${network}
+    topology.istio.io/network: ${network}
   name: istio-eastwest
   namespace: istio-eastwest
 spec:
