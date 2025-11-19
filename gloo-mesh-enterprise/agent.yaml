@@ -14,11 +14,15 @@ glooAgent:
     authority: gloo-mesh-mgmt-server.gloo-mesh
 telemetryCollector:
   enabled: true
+  mode: statefulset
+  replicaCount: 2
   config:
     exporters:
       otlp:
         endpoint: gloo-telemetry-gateway.gloo-mesh.mesh.internal:4317
 telemetryCollectorCustomization:
+  sharding:
+    enabled: true
   skipVerify: true
   extraExporters: # add new exporter to send to the Otel GW on port 4319
     otlp/ambient:
