@@ -27,6 +27,11 @@ jaeger:
   enabled: true
 telemetryCollector:
   enabled: true
+  mode: statefulset
+  replicaCount: 2
+telemetryCollectorCustomization:
+  sharding:
+    enabled: true
 telemetryGateway:
   enabled: true
   service:
